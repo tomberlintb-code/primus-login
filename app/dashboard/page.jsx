@@ -1,70 +1,61 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../../lib/firebase"; // relativer Pfad
+import { doc, getDoc } from "firebase/firestore";
 
-export default function DashboardPage() {
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(true);
+export default function Dashboard() {
   const router = useRouter();
+  const [name, setName] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, 'users', user.uid);
-          const docSnap = await getDoc(docRef);
+      if (!user) {
+        router.push("/");
+        return;
+      }
 
-          if (docSnap.exists()) {
-            setName(docSnap.data().name);
-          } else {
-            setName('Unbekannter Held');
-          }
-        } catch (error) {
-          console.error('Fehler beim Laden des Namens:', error);
-        } finally {
-          setLoading(false);
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setName(userData.name || "Benutzer");
+        } else {
+          setName("Unbekannt");
         }
-      } else {
-        router.push('/login');
+      } catch (err) {
+        setName("Fehler beim Laden");
+      } finally {
+        setLoading(false);
       }
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, []);
 
   const handleLogout = async () => {
     await signOut(auth);
-    router.push('/login');
+    router.push("/");
   };
 
   if (loading) {
-    return <div style={{ padding: '2rem' }}>Lade deine Begrüßung...</div>;
+    return <p className="p-10 text-xl">Lade...</p>;
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Willkommen, {name}!</h1>
-      <p>Dein persönliches Dashboard erwartet dich.</p>
-
+    <main className="flex flex-col items-center justify-center min-h-screen bg-green-100">
+      <h1 className="text-3xl mb-4 font-bold">Willkommen, {name}!</h1>
       <button
         onClick={handleLogout}
-        style={{
-          marginTop: '1.5rem',
-          padding: '0.75rem 1.5rem',
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontSize: '1rem',
-        }}
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
       >
         Logout
       </button>
-    </div>
+    </main>
   );
 }
