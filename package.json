@@ -2,12 +2,11 @@
   "name": "dienstplan-webapp",
   "version": "0.1.0",
   "private": true,
- "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start"
-}
-,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
   "dependencies": {
     "firebase": "^12.0.0",
     "next": "15.4.5",
@@ -16,6 +15,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/react": "^19.1.9",
     "eslint": "^9",
     "eslint-config-next": "15.4.5"
   }
