@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+console.log("API KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../lib/firebase"; // relativer Pfad
 import { doc, getDoc } from "firebase/firestore";
